@@ -1,0 +1,316 @@
+第一周简答题
+MVC、MVP的区别及使用场景
+Activity职责不同，Activity在MVP中是View层，在MVC中是Controller层，这是MVC和MVP很主要的一个区别，可以说Android从MVC转向MVP开发也主要是优化Activity的代码，避免Activity的代码臃肿庞大。
+
+View层不同，MVC的View层指的是XML布局文件或者是用Java自定义的View，MVP的View层是Activity或者Fragment。使用传统的MVC，其中的View，对应的是各种Layout布局文件，但是这些布局文件中并不像Web端那样强大，能做的事情非常有限。MVP的View层Activity在实际项目中，随着逻辑的复杂度越来越大，Activity臃肿的缺点仍然体现出来了，因为Activity中还是充满了大量与View层无关的代码，比如各种事件的处理派发，就如MVC中的那样View层和Controller代码耦合在一起无法自拔。
+
+控制层不同，MVC的控制层是Activity，或者是Fragment，Controller对应的是Activity，而Activity中却又具有操作UI的功能，我们在实际的项目中也会有很多UI操作在这一层，也做了很多View中应该做的事情，当然Controller层Activity中也包含Controller应该做的事情，比如各种事件的派发回调，而且在一层中我们会根据事件再去调用Model层操作数据，所以这种MVC的方式在实际项目中，Activity所在的Controller是非常重的，各层次之间的耦合情况也比较严重，不方便单元测试。MVP的控制层是Presenter，里面没有很多的实际东西，主要是做Model和View层的交互。
+
+关系链不同，MVP中Model层与View是没有关系的，彼此不会通讯和操作，Model与View的通讯都是Presenter层来传达的。但是在MVC中，Model层和View是曾在交互的。比如我们自定义的View控件里面肯定是要使用Model的数据的，View也要根据不同的Model数据做出不同的展现！这点尤其是体现在自定义的View中，自定义View需要设置数据，用户操作了自定义控件需要改变数据，View要操作Model怎么办？有人说把Controller传到自定义的View啊，现实是不可能没一个自定义View都去持有Controller的引用，其实在MVP中就不会这么尴尬，接口就可以完成。
+
+适用范围不同，在Android中，MVP和MVC都用自己的适用情况，使用MVP可以更好的解耦三大模块，模块之间比较清晰，也很方便使用MVP来组件化架构整体项目。但是MVC也是有用武之地的，在组件化的Module或者中间件我们可以使用MVC来做，Module或者中间件不会存在很复杂的View层，使用MVC可以更加方便我们实现功能。
+
+交互方式不同，MVP中通讯交互基本都是通过接口的，MVC中的通讯交互很多时候都是实打实的调用对象的方法，简单粗暴！
+
+实现方法不同 ，MVC和MVP的Model几乎一样的，都是处理数据，只要不在Activity或者Fragment中请求数据，其他的所有控制都放在Activity或者Fragment中，这样写就基本是MVC的模式，这样写不麻烦，但是很容易把Activity写出上万行代码。用MVP的时候我们需要写很多View和Presenter接口来实现模块之间的通讯，会增加很多类。
+
+1）相同点： 
+优点： 
+1.降低耦合度 
+2.模块职责划分明显 
+3.利于测试驱动开发 
+4.代码复用 
+5.隐藏数据 
+6.代码灵活性 
+缺点： 
+额外的代码复杂度及学习成本。
+（2）不同点： 
+MVP模式： 
+1.View不直接与Model交互，而是通过与Presenter交互来与Model间接交互 
+2.Presenter与View的交互是通过接口来进行的，更有利于添加单元测试 
+3.通常View与Presenter是一对一的，但复杂的View可能绑定多个Presenter来处理逻辑，业务相似的时候也可以多同个View共享一个Presenter。 
+MVC模式： 
+1.View可以与Model直接交互 
+2.Controller是基于行为的，并且可以被多个View共享 
+3.Controller可以负责决定显示哪个View
+
+
+应用场合：
+
+在web app 流行之初， MVC 就应用在了java（struts2）和C#（ASP.NET）服务端应用中，后来在客户端应用程序中，基于MVC模式，AngularJS应运而生。
+
+mvp适应于解耦，逻辑清晰的应用
+
+OkHttp对于网络请求都有哪些优化，如何实现的
+允许连接到同一个主机地址的所有请求,提高请求效率 
+共享Socket,减少对服务器的请求次数 
+通过连接池,减少了请求延迟 
+缓存响应数据来减少重复的网络请求 
+减少了对数据流量的消耗 
+自动处理GZip压缩
+
+RecyclerView 和 ListView 性能和效果区别
+RecyclerView相比ListView，有一些明显的优点：
+
+默认已经实现了View的复用，不需要类似if(convertView == null)的实现，而且回收机制更加完善。
+默认支持局部刷新。
+容易实现添加item、删除item的动画效果。
+容易实现拖拽、侧滑删除等功能。
+
+如何使用OkHttp进行异步网络请求，并根据请求结果刷新UI
+
+	//调用enqueue方法
+
+ String url = "https://code.aliyun.com/598254259/FristProject/raw/master/bw_test.txt";
+        OkHttpClient okHttpClient = new OkHttpClient();
+        final Request request = new Request.Builder().url(url).build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Message message = Message.obtain();
+                message.obj = response.body().string();
+                handler.sendMessage(message);
+            }
+        });
+
+简述RecyclerView有哪些功能和特性
+RecyclerView封装了viewholder的回收复用，也就是说RecyclerView标准化了ViewHolder，编写Adapter面向的是ViewHolder而不再是View了，复用的逻辑被封装了，写起来更加简单。直接省去了listview中convertView.setTag(holder)和convertView.getTag()这些繁琐的步骤。
+提供了一种插拔式的体验，高度的解耦，异常的灵活，针对一个Item的显示RecyclerView专门抽取出了相应的类，来控制Item的显示，使其的扩展性非常强。
+设置布局管理器以控制Item的布局方式，横向、竖向以及瀑布流方式例如：你想控制横向或者纵向滑动列表效果可以通过LinearLayoutManager这个类来进行控制(与GridView效果对应的是GridLayoutManager,与瀑布流对应的还StaggeredGridLayoutManager等)。也就是说RecyclerView不再拘泥于ListView的线性展示方式，它也可以实现GridView的效果等多种效果。
+可设置Item的间隔样式（可绘制）通过继承RecyclerView的ItemDecoration这个类，然后针对自己的业务需求去书写代码。
+可以控制Item增删的动画，可以通过ItemAnimator这个类进行控制，当然针对增删的动画，RecyclerView有其自己默认的实现。
+但是关于Item的点击和长按事件，需要用户自己去实现。
+MVC、MVP的区别及使用场景
+Activity职责不同，Activity在MVP中是View层，在MVC中是Controller层，这是MVC和MVP很主要的一个区别，可以说Android从MVC转向MVP开发也主要是优化Activity的代码，避免Activity的代码臃肿庞大。
+
+View层不同，MVC的View层指的是XML布局文件或者是用Java自定义的View，MVP的View层是Activity或者Fragment。使用传统的MVC，其中的View，对应的是各种Layout布局文件，但是这些布局文件中并不像Web端那样强大，能做的事情非常有限。MVP的View层Activity在实际项目中，随着逻辑的复杂度越来越大，Activity臃肿的缺点仍然体现出来了，因为Activity中还是充满了大量与View层无关的代码，比如各种事件的处理派发，就如MVC中的那样View层和Controller代码耦合在一起无法自拔。
+
+控制层不同，MVC的控制层是Activity，或者是Fragment，Controller对应的是Activity，而Activity中却又具有操作UI的功能，我们在实际的项目中也会有很多UI操作在这一层，也做了很多View中应该做的事情，当然Controller层Activity中也包含Controller应该做的事情，比如各种事件的派发回调，而且在一层中我们会根据事件再去调用Model层操作数据，所以这种MVC的方式在实际项目中，Activity所在的Controller是非常重的，各层次之间的耦合情况也比较严重，不方便单元测试。MVP的控制层是Presenter，里面没有很多的实际东西，主要是做Model和View层的交互。
+
+关系链不同，MVP中Model层与View是没有关系的，彼此不会通讯和操作，Model与View的通讯都是Presenter层来传达的。但是在MVC中，Model层和View是曾在交互的。比如我们自定义的View控件里面肯定是要使用Model的数据的，View也要根据不同的Model数据做出不同的展现！这点尤其是体现在自定义的View中，自定义View需要设置数据，用户操作了自定义控件需要改变数据，View要操作Model怎么办？有人说把Controller传到自定义的View啊，现实是不可能没一个自定义View都去持有Controller的引用，其实在MVP中就不会这么尴尬，接口就可以完成。
+
+适用范围不同，在Android中，MVP和MVC都用自己的适用情况，使用MVP可以更好的解耦三大模块，模块之间比较清晰，也很方便使用MVP来组件化架构整体项目。但是MVC也是有用武之地的，在组件化的Module或者中间件我们可以使用MVC来做，Module或者中间件不会存在很复杂的View层，使用MVC可以更加方便我们实现功能。
+
+交互方式不同，MVP中通讯交互基本都是通过接口的，MVC中的通讯交互很多时候都是实打实的调用对象的方法，简单粗暴！
+
+实现方法不同 ，MVC和MVP的Model几乎一样的，都是处理数据，只要不在Activity或者Fragment中请求数据，其他的所有控制都放在Activity或者Fragment中，这样写就基本是MVC的模式，这样写不麻烦，但是很容易把Activity写出上万行代码。用MVP的时候我们需要写很多View和Presenter接口来实现模块之间的通讯，会增加很多类。
+
+1）相同点： 
+优点： 
+1.降低耦合度 
+2.模块职责划分明显 
+3.利于测试驱动开发 
+4.代码复用 
+5.隐藏数据 
+6.代码灵活性 
+缺点： 
+额外的代码复杂度及学习成本。
+（2）不同点： 
+MVP模式： 
+1.View不直接与Model交互，而是通过与Presenter交互来与Model间接交互 
+2.Presenter与View的交互是通过接口来进行的，更有利于添加单元测试 
+3.通常View与Presenter是一对一的，但复杂的View可能绑定多个Presenter来处理逻辑，业务相似的时候也可以多同个View共享一个Presenter。 
+MVC模式： 
+1.View可以与Model直接交互 
+2.Controller是基于行为的，并且可以被多个View共享 
+3.Controller可以负责决定显示哪个View
+
+
+应用场合：
+
+在web app 流行之初， MVC 就应用在了java（struts2）和C#（ASP.NET）服务端应用中，后来在客户端应用程序中，基于MVC模式，AngularJS应运而生。
+
+mvp适应于解耦，逻辑清晰的应用
+
+OkHttp对于网络请求都有哪些优化，如何实现的
+允许连接到同一个主机地址的所有请求,提高请求效率 
+共享Socket,减少对服务器的请求次数 
+通过连接池,减少了请求延迟 
+缓存响应数据来减少重复的网络请求 
+减少了对数据流量的消耗 
+自动处理GZip压缩
+
+RecyclerView 和 ListView 性能和效果区别
+RecyclerView相比ListView，有一些明显的优点：
+
+默认已经实现了View的复用，不需要类似if(convertView == null)的实现，而且回收机制更加完善。
+默认支持局部刷新。
+容易实现添加item、删除item的动画效果。
+容易实现拖拽、侧滑删除等功能。
+
+如何使用OkHttp进行异步网络请求，并根据请求结果刷新UI
+
+	//调用enqueue方法
+
+ String url = "https://code.aliyun.com/598254259/FristProject/raw/master/bw_test.txt";
+        OkHttpClient okHttpClient = new OkHttpClient();
+        final Request request = new Request.Builder().url(url).build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Message message = Message.obtain();
+                message.obj = response.body().string();
+                handler.sendMessage(message);
+            }
+        });
+
+简述RecyclerView有哪些功能和特性
+RecyclerView封装了viewholder的回收复用，也就是说RecyclerView标准化了ViewHolder，编写Adapter面向的是ViewHolder而不再是View了，复用的逻辑被封装了，写起来更加简单。直接省去了listview中convertView.setTag(holder)和convertView.getTag()这些繁琐的步骤。
+提供了一种插拔式的体验，高度的解耦，异常的灵活，针对一个Item的显示RecyclerView专门抽取出了相应的类，来控制Item的显示，使其的扩展性非常强。
+设置布局管理器以控制Item的布局方式，横向、竖向以及瀑布流方式例如：你想控制横向或者纵向滑动列表效果可以通过LinearLayoutManager这个类来进行控制(与GridView效果对应的是GridLayoutManager,与瀑布流对应的还StaggeredGridLayoutManager等)。也就是说RecyclerView不再拘泥于ListView的线性展示方式，它也可以实现GridView的效果等多种效果。
+可设置Item的间隔样式（可绘制）通过继承RecyclerView的ItemDecoration这个类，然后针对自己的业务需求去书写代码。
+可以控制Item增删的动画，可以通过ItemAnimator这个类进行控制，当然针对增删的动画，RecyclerView有其自己默认的实现。
+但是关于Item的点击和长按事件，需要用户自己去实现。
+***********************************************************************************************************************************
+第二周简答题
+）简述对Android中的属性动画的理解（核心类及作用）
+实现动画的原理：通过不断控制 值 的变化，再不断 手动 赋给对象的属性，从而实现动画效果。
+
+
+属性动画常用的有两个类分别是ValueAnimator和ObjectAnimator
+
+从继承关系图中我们可以清晰的看到ValueAnimator和AnimatorSet是继承与抽象类Animator的，而ObjectAnimator和TimeAnimator是继承自ValueAnimator的
+
+其中ofFloat，ofInt它们接收的参数类型都是可变参，所以我们可以传入任何数量的值；传进去的值列表，就表示动画时的变化范围
+2）自定义View常见的实现方式有几种；
+1、组合控件
+
+　　组合控件，顾名思义就是将一些小的控件组合起来形成一个新的控件，这些小的控件多是系统自带的控件。比如很多应用中普遍使用的标题栏控件，其实用的就是组合控件
+
+2、自绘控件
+
+　　自绘控件的内容都是自己绘制出来的，在View的onDraw方法中完成绘制。
+
+3、继承控件
+
+　　就是继承已有的控件，创建新控件，保留继承的父控件的特性，并且还可以引入新特性。
+3）自定义流式布局控件FlowLayout的基本流程和核心思路；
+https://github.com/hongyangAndroid/FlowLayout
+
+1.继承自ViewGroup 
+2.重写onMeasure()方法，根据测量模式测量出控件的宽度和高度（其中包含了子控件的margin值），通过setMeasuredDimension(newWidthSize, newHeightSize);设置控件的宽高 
+3.实现onLayout()方法，对它的每一个子View进行布局设置，规则为从左到右依次排列，该行放不下子控件则将子控件放到新的一行
+4）介绍RecyclerView的三种布局管理器的应用
+1、LinearLayoutManager 线性布局管理器，呈现线性布局的RecyclerView，实现ListView效果。
+2、GridLayoutManager 网格布局管理器，呈现网格布局的RecyclerView，实现GridView效果。
+3、StaggeredGridLayoutManager 交错网格布局管理器，呈现交错网格布局的RecyclerView，StaggeredGridLayoutManager 是一种特殊的GridLayoutManager ，
+与GridLayoutManager 的区别在于，它允许每个Item的长度或高度不一致，实现瀑布流效果。
+5）简述对MVP架构的理解
+在我看来mvp框架其实是mvc框架变种产品。讲原本的activity/fragment的层次划分成present层和view层。
+m还是原来的实体层用来组装数据，p层则用来隔离view层，被称为中介层，v层还是view层主要用来展示数据的层。
+
+这样做的好处是：
+
+分离了视图逻辑和业务逻辑，降低了耦合
+Activity只处理生命周期的任务，代码变得更加简洁
+视图逻辑和业务逻辑分别抽象到了View和Presenter的接口中去，提高代码的可阅读性
+Presenter被抽象成接口，可以有多种具体的实现，所以方便进行单元测试
+把业务逻辑抽到Presenter中去，避免后台线程引用着Activity导致Activity的资源无法被系统回收从而引起内存泄露和OOM
+方便代码的维护和单元测试。
+************************************************************************************************************************************
+1、Android原生登录的基本流程和注意事项
+1、绘制登录页面UI
+	2、点击登录时，进行账号和密码非空校验
+	3、对账号进行正则校验
+	4、如有验证码校验，则获取验证码进行比对验证码
+	5、密码如需加密，则必须加密处理
+	6、账号和密码校验过后，走登录接口
+	7、成功后保存用户信息，失败给出提示
+	
+	注意事项
+	
+	1、账号和密码一定要进行校验
+	2、为了防止非人为因素，需要做验证码校验
+	3、为了保证用户安全，需要对密码进行加密处理
+2、简述Android全局异常捕获机制
+Android应用不可避免的发生crash,也就是崩溃,除了第三方的收集错误信息外，Android本身也有自己的全局异常捕获。
+
+1、首先需要定义一个类，实现Thread.UncaughtExceptionHandler接口，重写uncaughtException方法，在uncaughtException方法中，
+可以把异常存到本地或上传服务端。
+
+2、需要在Application初始化时，初始化CrashHandler
+
+3. 简述Token机制及应用场景
+
+token的意思是“令牌”，是服务端生成的一串字符串，作为客户端进行请求的一个标识
+
+当用户第一次登录后，服务器生成一个token并将此token返回给客户端，以后客户端只需带上这个token前来请求数据即可，无需再次带上用户名和密码。
+
+简单token的组成；uid(用户唯一的身份标识)、time(当前时间的时间戳)、sign（签名，token的前几位以哈希算法压缩成的一定长度的十六进制字符串。
+为防止token泄露）。
+
+
+机制原理：
+
+1.将荷载payload，以及Header信息进行Base64加密，形成密文payload密文，header密文。
+
+
+2.将形成的密文用句号链接起来，用服务端秘钥进行HS256加密，生成签名.
+
+
+3.将前面的两个密文后面用句号链接签名形成最终的token返回给服务端
+
+应用场景：
+
+客户端向服务端发送请求时
+
+4. 全局异常捕获的原理和意义
+
+原理
+
+Thread中存在两个UncaughtExceptionHandler。一个是静态的defaultUncaughtExceptionHandler，另一个是非静态uncaughtExceptionHandler。
+
+// null unless explicitly set
+private volatile UncaughtExceptionHandler uncaughtExceptionHandler;
+ 
+// null unless explicitly set
+private static volatile UncaughtExceptionHandler defaultUncaughtExceptionHandler;
+
+
+defaultUncaughtExceptionHandler:设置一个静态的默认的UncaughtExceptionHandler。来自所有线程中的Exception在抛出并且未捕获的情况下，
+都会从此路过。进程fork的时候设置的就是这个静态的defaultUncaughtExceptionHandler，管辖范围为整个进程。
+uncaughtExceptionHandler:为单个线程设置一个属于线程自己的uncaughtExceptionHandler，辖范围比较小。
+如果没有设置uncaughtExceptionHandler，将使用线程所在的线程组来处理这个未捕获异常。线程组ThreadGroup实现了UncaughtExceptionHandler，
+所以可以用来处理未捕获异常。ThreadGroup类定义：
+
+
+private ThreadGroup group;
+ 
+class ThreadGroup implements Thread.UncaughtExceptionHandler{}
+
+ThreadGroup实现的uncaughtException如下：
+
+public void uncaughtException(Thread t, Throwable e) {
+    if (parent != null) {
+        parent.uncaughtException(t, e);
+    } else {
+        Thread.UncaughtExceptionHandler ueh =
+            Thread.getDefaultUncaughtExceptionHandler();
+        if (ueh != null) {
+            ueh.uncaughtException(t, e);
+        } else if (!(e instanceof ThreadDeath)) {
+            System.err.print("Exception in thread \""
+                             + t.getName() + "\" ");
+            e.printStackTrace(System.err);
+        }
+    }
+}
+意义
+
+应用上线后，可以检测到线上应用的bug，可以针对bug来定位问题的所在，及时的来修改问题，优化我们的应用，以及给用户带来更好的体验。
+
+5. 简述消息推送的原理
+
+在Android开发中，app消息推送的基本原理就是要在推送服务器和客户端之间建立连接，而连接的建立方式主要有两种pull和push。
+在实践过程中我们发现，相较于通过轮询（pull）的方式来获得消息通知，建立长连接（push）进行推送无论是对用户终端的电量消耗，
+还是对云端数据访问流量的耗费都比轮询要好，因此目前主流的app消息推送基本都是通过push的方式实现的。
